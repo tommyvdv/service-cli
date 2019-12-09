@@ -1,4 +1,4 @@
-FROM php:7.1-fpm-buster as cli
+FROM php:7.4-fpm-buster as cli
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
@@ -124,7 +124,6 @@ RUN set -xe; \
 		libldap2-dev \
 		libmagickcore-dev \
 		libmagickwand-dev \
-		libmcrypt-dev \
 		libmemcached-dev \
 		libmhash-dev \
 		libpng-dev \
@@ -150,7 +149,6 @@ RUN set -xe; \
 		libldap-2.4-2 \
 		libmagickcore-6.q16-*-extra \
 		libmagickwand-6.q16-6 \
-		libmcrypt4 \
 		libmemcached11 \
 		libmemcachedutil2 \
 		libmhash2 \
@@ -187,7 +185,7 @@ RUN set -xe; \
 		intl \
 		ldap \
 		# mcrypt is deprecated in 7.1 and removed in 7.2. See Deprecated features.
-		mcrypt \
+		# mcrypt \
 		mysqli \
 		opcache \
 		pcntl \
@@ -389,7 +387,7 @@ COPY healthcheck.sh /opt/healthcheck.sh
 # PHP default settings, global overrides and fpm overrides
 # PHP_VERSION is set upstream. The source code for the exact PHP version may not be available in Github
 # TODO: For now, will just hardcoded a specific version available on https://github.com/php/php-src/
-ADD https://raw.githubusercontent.com/php/php-src/php-7.1.32/php.ini-development /usr/local/etc/php/php.ini
+ADD https://raw.githubusercontent.com/php/php-src/php-7.4.0/php.ini-development /usr/local/etc/php/php.ini
 COPY config/php/zz-php.ini /usr/local/etc/php/conf.d/zz-php.ini
 COPY config/php/xdebug.ini /opt/docker-php-ext-xdebug.ini
 COPY config/php/zz-php-fpm.conf /usr/local/etc/php-fpm.d/zz-php-fpm.conf
