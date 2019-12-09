@@ -164,15 +164,14 @@ RUN set -xe; \
 	git clone https://github.com/php/pecl-networking-ssh2.git /usr/src/php/ext/ssh2 && rm -rf /usr/src/php/ext/ssh2/.git; \
 	\
 	docker-php-ext-configure >/dev/null gd \
-		--with-freetype-dir=/usr/include/ \
-		--with-jpeg-dir=/usr/include/ \
-		--with-webp-dir=/usr/include/ \
-		--with-png-dir=/usr/include/ \
-		--with-xpm-dir=/usr/include/; \
-	docker-php-ext-configure >/dev/null imap --with-kerberos --with-imap-ssl; \
+		--with-freetype \
+		--with-jpeg \
+		--with-webp \
+		--with-xpm; \
+	PHP_OPENSSL=yes docker-php-ext-configure >/dev/null imap --with-kerberos --with-imap-ssl; \
 	docker-php-ext-configure >/dev/null ldap --with-libdir=lib/x86_64-linux-gnu/; \
 	docker-php-ext-configure >/dev/null pgsql --with-pgsql=/usr/local/pgsql/; \
-	docker-php-ext-configure >/dev/null zip --with-libzip; \
+	docker-php-ext-configure >/dev/null zip --with-zip; \
 	\
 	docker-php-ext-install >/dev/null -j$(nproc) \
 		bcmath \
@@ -184,8 +183,6 @@ RUN set -xe; \
 		imap \
 		intl \
 		ldap \
-		# mcrypt is deprecated in 7.1 and removed in 7.2. See Deprecated features.
-		# mcrypt \
 		mysqli \
 		opcache \
 		pcntl \
@@ -199,24 +196,23 @@ RUN set -xe; \
 		zip \
 	;\
 	pecl update-channels; \
-	pecl install >/dev/null </dev/null \
+	printf "\n" | pecl install >/dev/null \
 		apcu \
 		gnupg \
 		imagick \
-		# Use memcached (not memcache) for PHP 7.x
 		memcached \
-		pdo_sqlsrv \
 		redis \
-		sqlsrv \
 		xdebug \
+		pdo_sqlsrv-5.7.1preview \
+		sqlsrv-5.7.1preview \
 	;\
 	docker-php-ext-enable \
 		apcu \
 		gnupg \
 		imagick \
 		memcached \
-		pdo_sqlsrv \
 		redis \
+		pdo_sqlsrv \
 		sqlsrv \
 	;\
 	# Cleanup
@@ -227,7 +223,7 @@ RUN set -xe; \
 
 # PHP tools (installed globally)
 ENV COMPOSER_VERSION=1.9.0 \
-	DRUSH_VERSION=8.3.0 \
+	DRUSH_VERSION=8.3.2 \
 	DRUSH_LAUNCHER_VERSION=0.6.0 \
 	DRUPAL_CHECK_VERSION=1.0.13 \
 	DRUPAL_CONSOLE_LAUNCHER_VERSION=1.9.3 \
@@ -263,7 +259,7 @@ ENV MG_CODEGEN_VERSION=1.11.0 \
 	TERMINUS_VERSION=2.2.0 \
 	DRUSH_BACKDROP_VERSION=1.0.0
 # Don't use -x here, as the output may be excessive
-RUN set -e; \
+RUN set -xe; \
 	\
 	# Set drush8 as a global fallback for Drush Launcher
 	echo -e "\n""export DRUSH_LAUNCHER_FALLBACK=/usr/local/bin/drush8" >> $HOME/.profile; \
