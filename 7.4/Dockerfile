@@ -224,7 +224,7 @@ RUN set -xe; \
 	apt-get clean; rm -rf /var/lib/apt/lists/*
 
 # PHP tools (installed globally)
-ENV COMPOSER_VERSION=1.9.0 \
+ENV COMPOSER_VERSION=latest \
 	DRUSH_VERSION=8.3.0 \
 	DRUSH_LAUNCHER_VERSION=0.6.0 \
 	DRUPAL_CHECK_VERSION=1.0.13 \
@@ -232,6 +232,15 @@ ENV COMPOSER_VERSION=1.9.0 \
 	WPCLI_VERSION=2.3.0 \
 	BLACKFIRE_VERSION=1.27.4 \
 	PLATFORMSH_CLI_VERSION=3.52.3
+
+RUN set -xe; \
+	php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+	php -r "if (hash_file('sha384', 'composer-setup.php') === 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" && \
+	php composer-setup.php && \
+	php -r "unlink('composer-setup.php');" && \
+	mv composer.phar /usr/local/bin/composer && \
+	(cd /usr/local/bin && chmod +x composer)
+
 RUN set -xe; \
 	# Composer
 	curl -fsSL "https://github.com/composer/composer/releases/download/${COMPOSER_VERSION}/composer.phar" -o /usr/local/bin/composer; \
